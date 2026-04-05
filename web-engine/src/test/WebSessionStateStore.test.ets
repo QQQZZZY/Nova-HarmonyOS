@@ -1,5 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import { createDefaultWebSessionState, createDefaultSessionCapabilities } from '../main/ets/public/types/WebSessionState';
+import { SessionStateStore } from '../main/ets/internal/SessionStateStore';
 
 export default function webSessionStateStoreTest() {
   describe('WebSessionStateDefaults', () => {
@@ -25,6 +26,21 @@ export default function webSessionStateStoreTest() {
       expect(capabilities.supportsDownloadResume).assertTrue();
       expect(capabilities.supportsStateRestore).assertFalse();
       expect(capabilities.supportsFindInPage).assertFalse();
+    });
+
+    it('should update state snapshots immutably', 0, () => {
+      const store = new SessionStateStore(false);
+      const initial = store.getState();
+      store.update((draft) => {
+        draft.title = 'Nova';
+        draft.progress = 42;
+        draft.isLoading = true;
+      });
+      const next = store.getState();
+      expect(initial === next).assertFalse();
+      expect(next.title).assertEqual('Nova');
+      expect(next.progress).assertEqual(42);
+      expect(next.isLoading).assertTrue();
     });
   });
 }
