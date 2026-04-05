@@ -37,6 +37,10 @@
           ]
         }
       ]
+    },
+    {
+      "name": "web-engine",
+      "srcPath": "./web-engine"
     }
   ]
 }
