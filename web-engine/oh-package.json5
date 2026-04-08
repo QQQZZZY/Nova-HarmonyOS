@@ -1,0 +1,9 @@
+{
+  "name": "web-engine",
+  "version": "1.0.0",
+  "description": "HarmonyOS native WebEngine HAR module.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "",
+  "dependencies": {}
+}

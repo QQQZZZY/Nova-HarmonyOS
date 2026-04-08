@@ -10,3 +10,5 @@
 /.clang-tidy
 **/.test
 /.appanalyzer
+/.worktrees
+**/BuildProfile.ets

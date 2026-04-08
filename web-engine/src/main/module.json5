@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "webengine",
+    "type": "har",
+    "description": "$string:webengine_module_desc",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}
