@@ -1,4 +1,4 @@
-import { UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { createArkWebEngine } from 'web-engine';
 

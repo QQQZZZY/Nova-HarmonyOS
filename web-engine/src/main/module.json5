@@ -2,7 +2,7 @@
   "module": {
     "name": "webengine",
     "type": "har",
-    "description": "$string:module_desc",
+    "description": "$string:webengine_module_desc",
     "deviceTypes": [
       "phone",
       "tablet",

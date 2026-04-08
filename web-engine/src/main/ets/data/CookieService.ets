@@ -2,11 +2,18 @@ import { webview } from '@kit.ArkWeb';
 
 export class CookieService {
   getCookies(url: string, isPrivate: boolean): string {
-    return webview.WebCookieManager.fetchCookieSync(url, isPrivate);
+    try {
+      return webview.WebCookieManager.fetchCookieSync(url, isPrivate);
+    } catch (_error) {
+      return '';
+    }
   }
 
   setCookie(url: string, value: string, isPrivate: boolean): void {
-    webview.WebCookieManager.configCookieSync(url, value, isPrivate);
-    webview.WebCookieManager.saveCookieSync();
+    try {
+      webview.WebCookieManager.configCookieSync(url, value, isPrivate);
+      webview.WebCookieManager.saveCookieSync();
+    } catch (_error) {
+    }
   }
 }

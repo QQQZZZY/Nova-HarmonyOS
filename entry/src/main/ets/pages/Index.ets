@@ -7,11 +7,11 @@ import {
   WebPopupDecision,
   WebSessionHost,
   WebSessionOptions,
+  WebFileChooserResult,
   type WebDialogRequest,
   type WebDownloadDecision,
   type WebDownloadRequest,
   type WebFileChooserRequest,
-  type WebFileChooserResult,
   type WebPermissionRequest,
   type WebPopupRequest,
   type WebSession,
@@ -93,21 +93,23 @@ class DemoRequestHandler implements WebSessionRequestHandler {
   }
 }
 
+const demoEngine = createArkWebEngine();
+const demoObserver = new DemoObserver();
+const demoRequestHandler = new DemoRequestHandler();
+
+function createDemoSession(): WebSession {
+  const options = new WebSessionOptions();
+  options.initialUrl = 'https://www.example.com';
+  const session = demoEngine.createSession(options);
+  session.addObserver(demoObserver);
+  session.setRequestHandler(demoRequestHandler);
+  return session;
+}
+
 @Entry
 @Component
 struct Index {
-  private readonly engine = createArkWebEngine();
-  private readonly options = new WebSessionOptions();
-  private readonly observer = new DemoObserver();
-  private readonly requestHandler = new DemoRequestHandler();
-  private readonly session: WebSession;
-
-  constructor() {
-    this.options.initialUrl = 'https://www.example.com';
-    this.session = this.engine.createSession(this.options);
-    this.session.addObserver(this.observer);
-    this.session.setRequestHandler(this.requestHandler);
-  }
+  private readonly session: WebSession = createDemoSession();
 
   build() {
     Column() {

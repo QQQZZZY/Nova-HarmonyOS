@@ -12,14 +12,17 @@ import { ArkWebControllerBinding } from './ArkWebControllerBinding';
 
 export class ArkWebSession implements WebSession {
   private readonly id: string = util.generateRandomUUID();
+  private readonly options: WebSessionOptions;
   private readonly stateStore: SessionStateStore;
   private readonly observers: EventDispatcher<WebSessionObserver> = new EventDispatcher<WebSessionObserver>();
   private readonly capabilities: WebSessionCapabilities = createDefaultSessionCapabilities();
   private readonly binding: ArkWebControllerBinding = new ArkWebControllerBinding();
   private requestHandler: WebSessionRequestHandler | null = null;
   private initialUrl: string | null = null;
+  private bridgeConfig: WebBridgeConfig = new WebBridgeConfig();
 
-  constructor(private readonly options: WebSessionOptions) {
+  constructor(options: WebSessionOptions) {
+    this.options = options;
     this.stateStore = new SessionStateStore(options.isPrivate);
     this.initialUrl = options.initialUrl;
   }
@@ -54,35 +57,97 @@ export class ArkWebSession implements WebSession {
 
   async loadUrl(url: string): Promise<void> {
     this.initialUrl = url;
+    this.getStateStore().update((draft) => {
+      draft.currentUrl = url;
+      draft.isLoading = true;
+      draft.progress = 0;
+    });
+    if (this.binding.attached) {
+      try {
+        this.binding.controller.loadUrl(url);
+      } catch (_error) {
+      }
+    }
+    this.emitStateChanged();
   }
 
   async reload(ignoreCache: boolean): Promise<void> {
     void ignoreCache;
+    if (this.binding.attached) {
+      try {
+        this.binding.controller.refresh();
+      } catch (_error) {
+      }
+    }
+    this.getStateStore().update((draft) => {
+      draft.isLoading = true;
+      draft.progress = 0;
+    });
+    this.emitStateChanged();
   }
 
   stopLoading(): void {
+    if (this.binding.attached) {
+      try {
+        this.binding.controller.stop();
+      } catch (_error) {
+      }
+    }
+    this.getStateStore().update((draft) => {
+      draft.isLoading = false;
+    });
+    this.emitStateChanged();
   }
 
   async goBack(): Promise<void> {
+    if (this.binding.attached) {
+      try {
+        this.binding.controller.backward();
+      } catch (_error) {
+      }
+    }
   }
 
   async goForward(): Promise<void> {
+    if (this.binding.attached) {
+      try {
+        this.binding.controller.forward();
+      } catch (_error) {
+      }
+    }
   }
 
   async evaluateJavaScript(script: string): Promise<string | null> {
-    void script;
-    return null;
+    if (!this.binding.attached) {
+      return null;
+    }
+    try {
+      return this.binding.controller.runJavaScript(script);
+    } catch (_error) {
+      return null;
+    }
   }
 
   async setCustomUserAgent(userAgent: string): Promise<void> {
-    void userAgent;
+    if (this.binding.attached) {
+      try {
+        this.binding.controller.setCustomUserAgent(userAgent);
+      } catch (_error) {
+      }
+    }
   }
 
   async setBridgeConfig(config: WebBridgeConfig): Promise<void> {
-    void config;
+    this.bridgeConfig = config;
   }
 
   close(): void {
+    this.getStateStore().update((draft) => {
+      draft.isAttached = false;
+      draft.isVisible = false;
+      draft.isLoading = false;
+    });
+    this.emitStateChanged();
   }
 
   getBinding(): ArkWebControllerBinding {
@@ -108,7 +173,10 @@ export class ArkWebSession implements WebSession {
     });
     this.emitStateChanged();
     if (this.initialUrl !== null && this.initialUrl.length > 0) {
-      this.binding.controller.loadUrl(this.initialUrl);
+      try {
+        this.binding.controller.loadUrl(this.initialUrl);
+      } catch (_error) {
+      }
     }
   }
 

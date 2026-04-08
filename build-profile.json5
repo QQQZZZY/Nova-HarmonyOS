@@ -39,7 +39,7 @@
       ]
     },
     {
-      "name": "web-engine",
+      "name": "webengine",
       "srcPath": "./web-engine"
     }
   ]
