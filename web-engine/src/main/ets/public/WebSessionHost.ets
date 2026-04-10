@@ -1,5 +1,4 @@
 import { ArkWebSession } from '../arkweb/ArkWebSession';
-import { applyLoadFinished, applyLoadStarted, applyNavigationCommitted } from '../arkweb/ArkWebEventAdapter';
 import type { WebSession } from './WebSession';
 
 @Component
@@ -21,26 +20,17 @@ export struct WebSessionHost {
         controller: this.getArkSession().getBinding().controller,
         incognitoMode: this.getArkSession().getState().isPrivate
       })
-        .onControllerAttached(() => {
-          const arkSession = this.getArkSession();
-          const binding = arkSession.getBinding();
-          binding.markAttached();
-          arkSession.handleAttached();
-        })
         .onLoadStarted(() => {
           const arkSession = this.getArkSession();
-          applyLoadStarted(arkSession.getStateStore());
-          arkSession.emitStateChanged();
+          arkSession.handleLoadStarted();
         })
         .onNavigationEntryCommitted((event: LoadCommittedDetails) => {
           const arkSession = this.getArkSession();
-          applyNavigationCommitted(arkSession.getStateStore(), event.url);
-          arkSession.emitStateChanged();
+          arkSession.handleNavigationCommitted(event.url);
         })
         .onLoadFinished(() => {
           const arkSession = this.getArkSession();
-          applyLoadFinished(arkSession.getStateStore(), arkSession.getState().title);
-          arkSession.emitStateChanged();
+          arkSession.handleLoadFinished();
         })
     }
     .height('100%')

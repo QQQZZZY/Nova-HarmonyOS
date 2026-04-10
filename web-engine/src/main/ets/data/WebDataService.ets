@@ -1,6 +1,12 @@
 import { webview } from '@kit.ArkWeb';
 import { WebDataClearOptions, WebDataScope } from '../public/types/WebDataTypes';
 
+export interface WebDataClearActions {
+  clearCacheAction?: (clearRom: boolean) => void;
+  clearSslStateAction?: () => void;
+  clearClientAuthStateAction?: () => void;
+}
+
 export class WebDataClearPlan {
   clearCookies: boolean = false;
   clearWebStorage: boolean = false;
@@ -26,7 +32,7 @@ export function mapDataClearPlan(options: WebDataClearOptions): WebDataClearPlan
 }
 
 export class WebDataService {
-  clear(options: WebDataClearOptions, clearCacheAction: ((clearRom: boolean) => void) | null = null): void {
+  clear(options: WebDataClearOptions, actions: WebDataClearActions = {}): void {
     const plan = mapDataClearPlan(options);
     if (plan.clearCookies) {
       if (plan.bothModes) {
@@ -44,8 +50,14 @@ export class WebDataService {
         webview.WebStorage.deleteAllData(plan.privateMode);
       }
     }
-    if (plan.clearCache && clearCacheAction !== null) {
-      clearCacheAction(plan.clearRom);
+    if (plan.clearCache && actions.clearCacheAction !== undefined) {
+      actions.clearCacheAction(plan.clearRom);
+    }
+    if (plan.clearSslState && actions.clearSslStateAction !== undefined) {
+      actions.clearSslStateAction();
+    }
+    if (plan.clearClientAuthState && actions.clearClientAuthStateAction !== undefined) {
+      actions.clearClientAuthStateAction();
     }
   }
 }

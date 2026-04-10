@@ -1,6 +1,11 @@
 import { describe, it, expect } from '@ohos/hypium';
 import { SessionStateStore } from '../main/ets/internal/SessionStateStore';
-import { applyNavigationCommitted, applyLoadStarted, applyLoadFinished } from '../main/ets/arkweb/ArkWebEventAdapter';
+import {
+  applyControllerStateSnapshot,
+  applyNavigationCommitted,
+  applyLoadStarted,
+  applyLoadFinished
+} from '../main/ets/arkweb/ArkWebEventAdapter';
 
 export default function arkWebEventAdapterTest() {
   describe('ArkWebEventAdapter', () => {
@@ -8,13 +13,21 @@ export default function arkWebEventAdapterTest() {
       const store = new SessionStateStore(false);
       applyLoadStarted(store);
       applyNavigationCommitted(store, 'https://example.com');
-      applyLoadFinished(store, 'Nova');
+      applyControllerStateSnapshot(store, {
+        title: 'Nova',
+        currentUrl: 'https://example.com',
+        canGoBack: true,
+        canGoForward: false
+      });
+      applyLoadFinished(store);
       const state = store.getState();
       expect(state.isLoading).assertFalse();
       expect(state.lastCommittedUrl).assertEqual('https://example.com');
       expect(state.currentUrl).assertEqual('https://example.com');
       expect(state.title).assertEqual('Nova');
       expect(state.progress).assertEqual(100);
+      expect(state.canGoBack).assertTrue();
+      expect(state.canGoForward).assertFalse();
     });
   });
 }

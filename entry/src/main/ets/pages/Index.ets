@@ -1,5 +1,4 @@
 import {
-  createArkWebEngine,
   WebDialogResult,
   WebDialogType,
   WebNavigationDecision,
@@ -19,11 +18,10 @@ import {
   type WebSessionRequestHandler,
   type WebNavigationRequest,
   type WebDownloadEvent,
-  type WebBridgeMessage,
-  type WebEngineHealthEvent,
   type WebSessionError,
   type WebSessionState
 } from 'web-engine';
+import { appWebEngine } from '../entryability/EntryAbility';
 
 class DemoObserver implements WebSessionObserver {
   onStateChanged(session: WebSession, state: WebSessionState): void {
@@ -32,16 +30,6 @@ class DemoObserver implements WebSessionObserver {
   }
 
   onDownloadEvent(session: WebSession, event: WebDownloadEvent): void {
-    void session;
-    void event;
-  }
-
-  onBridgeMessage(session: WebSession, message: WebBridgeMessage): void {
-    void session;
-    void message;
-  }
-
-  onEngineHealthEvent(session: WebSession, event: WebEngineHealthEvent): void {
     void session;
     void event;
   }
@@ -93,16 +81,18 @@ class DemoRequestHandler implements WebSessionRequestHandler {
   }
 }
 
-const demoEngine = createArkWebEngine();
+const demoEngine = appWebEngine;
 const demoObserver = new DemoObserver();
 const demoRequestHandler = new DemoRequestHandler();
+const dataManager = demoEngine.getDataManager();
+void dataManager;
 
 function createDemoSession(): WebSession {
   const options = new WebSessionOptions();
   options.initialUrl = 'https://www.example.com';
   const session = demoEngine.createSession(options);
-  session.addObserver(demoObserver);
-  session.setRequestHandler(demoRequestHandler);
+  session.bindObserver(demoObserver);
+  session.bindRequestHandler(demoRequestHandler);
   return session;
 }
 

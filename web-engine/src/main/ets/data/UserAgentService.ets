@@ -2,10 +2,16 @@ import { webview } from '@kit.ArkWeb';
 
 export class UserAgentService {
   setAppCustomUserAgent(userAgent: string): void {
-    webview.WebviewController.setAppCustomUserAgent(userAgent);
+    try {
+      webview.WebviewController.setAppCustomUserAgent(userAgent);
+    } catch (_error) {
+    }
   }
 
   setUserAgentForHosts(userAgent: string, hosts: Array<string>): void {
-    webview.WebviewController.setUserAgentForHosts(userAgent, hosts);
+    try {
+      webview.WebviewController.setUserAgentForHosts(userAgent, hosts);
+    } catch (_error) {
+    }
   }
 }
